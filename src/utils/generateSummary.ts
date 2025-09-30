@@ -1,7 +1,7 @@
 
 import {GoogleGenAI} from '@google/genai'
 import type { Question } from '../types'
-import axios from 'axios';
+// import axios from 'axios';
 
 const genai = new GoogleGenAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY || '',

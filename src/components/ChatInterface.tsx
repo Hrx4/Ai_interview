@@ -48,7 +48,7 @@ const session = useSelector(state => state.session.currentSession);
 
     const [inputValue, setInputValue] = useState('');
     const [isPaused, setIsPaused] = useState(false);
-    const [resumeModal , setResumeModal] = useState(false);
+    // const [resumeModal , setResumeModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
    const inputValueRef = useRef<InputRef>(null);
@@ -94,7 +94,7 @@ const session = useSelector(state => state.session.currentSession);
       }
 
     }))
-    setResumeModal(true);
+    // setResumeModal(true);
   }
 
   const onResume =()=>{
@@ -105,7 +105,7 @@ const session = useSelector(state => state.session.currentSession);
         isPaused: false,
       }
     }))
-    setResumeModal(false);
+    // setResumeModal(false);
   }
   // const onTimeUp = (e: React.FormEvent) => {
   //   e.preventDefault();
