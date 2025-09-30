@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# AI-Powered Interview Assistant (Swipe Internship Assignment)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based AI-powered interview assistant designed for full-stack (React/Node) interviews.  
+This project demonstrates dynamic AI-generated interview questions, timed responses, resume parsing, and a dashboard for interviewers.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Demo
 
-## React Compiler
+- **Live Demo:** [Deployed Link](https://ai-interview-six-iota.vercel.app/)  
+- **Demo Video:** [Video link](https://drive.google.com/file/d/1tEVOaXnCB94PP8AKZxm6ZQjUkhHpeqbC/view?usp=sharing)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🧩 Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Interviewee (Chat)
+- Upload **PDF** (required) or **DOCX** (optional) resumes.  
+- AI extracts **Name, Email, Phone**; missing fields are collected via chatbot.  
+- Timed interview flow:
+  - **6 questions**: 2 Easy → 2 Medium → 2 Hard  
+  - Timers per question: Easy 20s, Medium 60s, Hard 120s  
+  - Auto-submit answers on timeout  
+- AI evaluates answers and generates a **final score and summary**.  
+- Supports **pause/resume** with a “Welcome Back” modal.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Interviewer (Dashboard)
+- List of all candidates with **final scores** and **summary**.  
+- Click a candidate to view **detailed Q&A** with AI scores.  
+- Search and sort candidates.  
+- Fully synced with interviewee tab.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Persistence
+- Local storage persistence using **Redux + redux-persist**  
+- Restores interview progress on page reload or browser close.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠 Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Frontend:** React, TypeScript, Ant Design  
+- **State Management:** Redux Toolkit + redux-persist  
+- **PDF Parsing:** `pdfjs-dist`  
+- **DOCX Parsing:** `mammoth`  
+- **AI Integration:** Gemini / Ollama (server-side and for local AI)
+  - Resume extraction
+  - Dynamic question generation
+  - Answer scoring
+  - Candidate summary
+- **Deployment:** Vercel 
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+# Clone the repo
+git clone https://github.com/Hrx4/Ai_interview
+
+# Install dependencies
+npm install
+
+# Run locally
+npm run dev
