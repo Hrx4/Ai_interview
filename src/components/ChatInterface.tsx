@@ -1,4 +1,4 @@
-import { Button, Input } from "antd";
+import { Button, Input, type InputRef } from "antd";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "../types";
 import { useAppSelector as useSelector } from '../hooks/useAppSelector';
@@ -21,8 +21,9 @@ interface ChatInterfaceProps {
   isTimerActive: boolean;
   disabled?: boolean;
   error: string;
-  setError: (error: string) => void;
+  // setError: (error: string) => void;
   handleRetry: () => void;
+  isLoading: boolean;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -33,8 +34,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   isTimerActive,
   disabled = false,
   error,
-  setError,
-  handleRetry
+  // setError,
+  handleRetry,
+  isLoading
 }) =>  {
   const dispatch = useAppDispatch();
 
@@ -49,6 +51,14 @@ const session = useSelector(state => state.session.currentSession);
     const [resumeModal , setResumeModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+   const inputValueRef = useRef<InputRef>(null);
+  
+  // useEffect(() => {
+  //   if (inputValueRef.current) {
+  //     inputValueRef.current.focus();
+  //   }
+  // }, [inputValue]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -59,8 +69,10 @@ const session = useSelector(state => state.session.currentSession);
 
 
    const handleSubmit = useCallback(() => {
+    console.log("handleSubmit called",inputValueRef.current, disabled);
     if ( !disabled) {
-      onSendMessage(inputValue.trim()||'');
+      console.log("Submitting answer:", inputValueRef.current);
+      onSendMessage(inputValueRef.current?.input?.value.trim()||'');
       setInputValue('');
       console.log(currentQuestion)
     }
@@ -165,7 +177,13 @@ const session = useSelector(state => state.session.currentSession);
           </div>
         ))}
         <div ref={messagesEndRef} />
+        {
+        isLoading && <div>
+        <span className="text-yellow-700 p-2 rounded-2xl bg-amber-100">Ai is Generating Response...</span>
       </div>
+      }
+      </div>
+      
 
       {/* Input */}
       {
@@ -179,10 +197,11 @@ const session = useSelector(state => state.session.currentSession);
         <form  className="flex space-x-2">
           <Input
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {console.log("onChange called",e.target.value); setInputValue(e.target.value)}}
             placeholder={disabled ? "Interview completed" : "Type your answer..."}
             disabled={disabled}
             className="flex-1"
+            ref={inputValueRef}
           />
           <Button
             disabled={!inputValue.trim() || disabled}

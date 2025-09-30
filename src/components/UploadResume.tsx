@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button, Card } from "antd";
-import { extractTextFromPDF } from "../utils/extractText";
+import { extractTextFromFile } from "../utils/extractText";
 import { resumeData } from "../utils/resumeData";
 import { v4 as uuidv4 } from 'uuid';
 import { addCandidate } from "../store/candidatesSlice";
@@ -15,14 +15,17 @@ const UploadResume = ({startInterview}: {startInterview: (interviewId: string , 
         const [uploading, setUploading] = useState(false);
 
         const dispatch = useAppDispatch();
+const inputRef = useRef<HTMLInputElement>(null);
 
 
         const handleFileInput = async(e: React.ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files?.[0];
+          setUploading(true);
+            try {
+              const file = e.target.files?.[0];
             if (!file) {
                 return;
             }
-            const ans = await extractTextFromPDF(file)
+            const ans = await extractTextFromFile(file)
             // console.log(ans);
             const dataFromResume = await resumeData(ans)
             console.log(dataFromResume)
@@ -40,7 +43,7 @@ const UploadResume = ({startInterview}: {startInterview: (interviewId: string , 
               name: dataFromResume.name || '',
               email: dataFromResume.email || '',
               phone: dataFromResume.phone || '',
-              resumeFile: file,
+              resumeFileName: file.name,
               resumeContent: ans,
               status: 'pending',
               createdAt: new Date().toLocaleDateString(),
@@ -77,9 +80,17 @@ const UploadResume = ({startInterview}: {startInterview: (interviewId: string , 
               startInterview(interviewId , candidateId);
             }
             setError('');
-            setUploading(true);
+            
             // uploadFile(file);
-        };
+            } catch (err: any) {
+              setError(err.message);
+              if (inputRef.current) {
+              inputRef.current.value = '';
+            }
+            }
+                        setUploading(false);
+
+          }
         
 
        
@@ -92,18 +103,26 @@ const UploadResume = ({startInterview}: {startInterview: (interviewId: string , 
 
         <Button
         //   onClick={() => handleFile}
-        //   disabled={uploading}
+          disabled={uploading}
         className="mt-4"
         >
           <input
           type="file"
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           accept=".pdf,.docx"
+          ref={inputRef}
           onChange={handleFileInput}
           disabled={uploading}
         />
-          Choose File
+          {
+            uploading ? 'Uploading...' : 'Choose File'
+          }
         </Button>
+        {
+          error && <div className="mt-4 p-3 bg-red-100 border border-red-400 rounded">
+            <p className="text-red-500 mt-2">{error}</p>
+          </div>
+        }
   </Card>
    
     </>

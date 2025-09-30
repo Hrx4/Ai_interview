@@ -1,4 +1,3 @@
-import { Modal } from "antd"
 import { useAppSelector as useSelector } from '../hooks/useAppSelector';
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { setWelcomeBack } from "../store/sessionSlice";

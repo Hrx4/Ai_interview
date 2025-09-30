@@ -6,6 +6,7 @@ import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { Candidate } from '../types';
 import { useAppSelector as useSelector } from '../hooks/useAppSelector';
 import ViewDetails from './ViewDetails';
+import Highlighter from "react-highlight-words";
 
 
 type DataIndex = keyof Candidate;
@@ -104,7 +105,12 @@ const InteviewerDashboard: React.FC = () => {
     },
     render: (text) =>
       searchedColumn === dataIndex ? (
-        null
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
       ) : (
         text
       ),
@@ -136,7 +142,7 @@ const InteviewerDashboard: React.FC = () => {
       key: 'score',
       // width: '20%',
       // sorter: (a, b) => a.score - b.score,
-      render: (text, record) => <span>{record.score !== undefined ? record.score : 'N/A'}</span>,
+      render: (_, record) => <span>{record.score !== undefined ? record.score : 'N/A'}</span>,
       sortDirections: ['descend', 'ascend'],
     },
     {

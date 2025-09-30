@@ -9,7 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { persistor, store } from './store';
 import { useAppDispatch } from './hooks/useAppDispatch';
 import { useAppSelector as useSelector } from './hooks/useAppSelector';
-import { setWelcomeBack } from './store/sessionSlice';
+import { clearSession, setWelcomeBack } from './store/sessionSlice';
 
 
 type TabType = 'interviewee' | 'interviewer';
@@ -34,11 +34,14 @@ const AppContent = () => {
   const session = useSelector(state => state.session.currentSession);
 
     const [activeTab, setActiveTab] = useState<TabType>('interviewee');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
     // Check for active session on app load
     if (session && session.isActive && session.currentStep !== 'completed') {
       dispatch(setWelcomeBack(true));
+    }else{
+      dispatch(clearSession())
     }
   }, []);
 
@@ -52,8 +55,8 @@ const AppContent = () => {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              I
+            <div className="h-8 w-8 text-white bg-blue-600 rounded-lg flex items-center justify-center">
+              A
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">AI Interview Assistant</h1>
@@ -85,7 +88,7 @@ const AppContent = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         {activeTab === 'interviewee' ? (
-          <IntervieweeTab />
+          <IntervieweeTab isLoading={isLoading} setIsLoading={setIsLoading} />
         ) : (
           <InterviewerDashboard />
         )}

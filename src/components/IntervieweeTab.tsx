@@ -2,9 +2,9 @@ import { useAppSelector as useSelector } from '../hooks/useAppSelector';
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import UploadResume from "./UploadResume"
 import { useCallback, useState } from 'react';
-import { Button, Card, Input, message } from 'antd';
+import { Button, Card, Input } from 'antd';
 import { updateCandidate } from '../store/candidatesSlice';
-import { addChatMessage, clearSession, updateSession } from '../store/sessionSlice';
+import { addChatMessage, updateSession } from '../store/sessionSlice';
 import type { Candidate, ChatMessage, Interview } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { addQuestion, createInterview, nextQuestion, updateInterview, updateQuestion } from '../store/interviewsSlice';
@@ -12,7 +12,7 @@ import { generateQuestion } from '../utils/generateQuestion';
 import ChatInterface from './ChatInterface';
 import { generateSummary } from '../utils/generateSummary';
 
-const IntervieweeTab = () => {
+const IntervieweeTab = ({isLoading , setIsLoading}: {isLoading: boolean, setIsLoading: (isLoading: boolean) => void}) => {
 
   const dispatch = useAppDispatch();
   const session = useSelector(state => state.session.currentSession);
@@ -26,7 +26,6 @@ const IntervieweeTab = () => {
     email: '',
     phone: ''
   });
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>('');
 
   
@@ -60,7 +59,7 @@ const IntervieweeTab = () => {
     console.log('Starting interview with ID:', interviewId );
     // if (!session) return;
     // console.log('Session found:', session);
-
+    setIsLoading(true);
     try {
             const firstQuestion = await generateQuestion('easy');
 
@@ -103,15 +102,18 @@ const IntervieweeTab = () => {
       };
 
       dispatch(addChatMessage(questionMessage));
-
+      setError('');
     } catch (error) {
       console.error('Error starting interview:', error);
+      setError('startInterview')
     } finally {
+      setIsLoading(false);
     }
     };
 
     const showNextQuestion = async(nextQuestionIndex: number) => {
     if (!session || !currentInterview) return;
+    setIsLoading(true);
 
     const questionType = nextQuestionIndex < 2 ? 'easy' 
     : nextQuestionIndex < 4 ? 'medium' : 'hard';
@@ -119,7 +121,7 @@ const IntervieweeTab = () => {
 
     const questionCount = nextQuestionIndex <2 ? 20
     : nextQuestionIndex < 4 ? 60
-    : 10;
+    : 120;
     let nextGeneratedQuestion = '';
     try {
       nextGeneratedQuestion = await generateQuestion(questionType);
@@ -158,7 +160,9 @@ const IntervieweeTab = () => {
       timeLimit: questionCount,
     }
   }));
+      setIsLoading(false);
   dispatch(nextQuestion(currentInterview.id));
+
 
     };
 
@@ -187,7 +191,7 @@ const IntervieweeTab = () => {
 
     const completeInterview = async () => {
       if (!session || !currentInterview) return;
-
+      setIsLoading(true);
       const completeMessage: ChatMessage = {
         id: uuidv4(),
         type: 'system',
@@ -220,6 +224,7 @@ const IntervieweeTab = () => {
         return
       }
       handleSummaryRetry({summary, score});
+      setIsLoading(false)
       
     };
     
@@ -309,6 +314,10 @@ console.log("Current question found:", question);
     if(error === 'nextQuestion' && currentInterview )
     {
       showNextQuestion(currentInterview.currentQuestionIndex + 1);
+    }
+    else if(error === 'startInterview' && session)
+    {
+      startInterview(session.interviewId , session.candidateId);
     }
     else if(error === 'summary' && currentInterview)
     {
@@ -401,8 +410,9 @@ console.log("Current question found:", question);
         isTimerActive={!!currentQuestion && !isLoading}
         disabled={isInterviewCompleted || isLoading}
         error = {error}
-        setError={setError}
+        // setError={setError}
         handleRetry={handleRetry}
+        isLoading={isLoading}
         />
         </>
   )
