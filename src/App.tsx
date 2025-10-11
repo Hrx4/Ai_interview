@@ -56,10 +56,10 @@ const AppContent = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="h-8 w-8 text-white bg-blue-600 rounded-lg flex items-center justify-center">
-              A
+              C
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">AI Interview Assistant</h1>
+              <h1 className="text-xl font-bold text-gray-900">Crisp - An AI Interview Assistant</h1>
               <p className="text-sm text-gray-600">Full Stack Developer Interview</p>
             </div>
           </div>

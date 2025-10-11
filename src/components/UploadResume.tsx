@@ -98,7 +98,7 @@ const inputRef = useRef<HTMLInputElement>(null);
   return (
     <>
     <Card  className="shadow-lg p-6 rounded-lg text-center w-96">
-    <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to AI Interview</h2>
+    <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Crisp</h2>
         <p className="text-gray-600">Let's start by uploading your resume</p>
 
         <Button
