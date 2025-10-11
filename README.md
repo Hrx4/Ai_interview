@@ -1,4 +1,4 @@
-# AI-Powered Interview Assistant (Swipe Internship Assignment)
+# AI-Powered Interview Assistant 
 
 A React-based AI-powered interview assistant designed for full-stack (React/Node) interviews.  
 This project demonstrates dynamic AI-generated interview questions, timed responses, resume parsing, and a dashboard for interviewers.
