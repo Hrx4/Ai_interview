@@ -8,8 +8,6 @@ This project demonstrates dynamic AI-generated interview questions, timed respon
 ##  Demo
 
 - **Live Demo:** [Deployed Link](https://ai-interview-six-iota.vercel.app/)  
-- **Demo Video:** [Video link](https://drive.google.com/file/d/1tEVOaXnCB94PP8AKZxm6ZQjUkhHpeqbC/view?usp=sharing)
-
 ---
 
 ##  Features
