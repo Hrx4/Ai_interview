@@ -1,66 +1,113 @@
 import express from "express";
 import axios from "axios";
 import cors from "cors";
+import OpenAI from "openai";
+import { z } from "zod";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { configDotenv } from "dotenv";
+
+configDotenv();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const parseJson = (text) => {
-  const match = text.match(/```json([\s\S]*?)```/);
-  if (match) {
-    return JSON.parse(match[1].trim());
-  }
+const openai = new OpenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+});
 
-  // fallback: try to find any valid JSON in string
-  const braceMatch = text.match(/\{[\s\S]*\}/);
-  if (braceMatch) {
-    return JSON.parse(braceMatch[0]);
-  }
+const evalutionValidator = z.object({
+  summary: z.string(),
+  score: z.number(),
+});
 
-  throw new Error("No JSON found in response");
-}
+const questionValidator = z.object({
+  question: z.string(),
+});
 
 
 app.post("/api/chat", async (req, res) => {
-  const { prompt } = req.body;
+  const { stage } = req.body;
   try {
-    console.log("Received prompt:", prompt);
-    const response = await axios.post("http://localhost:11434/api/generate", {
-      model: "llama3.1:latest",
-      prompt,
-      stream: false,
+    const response = await openai.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [
+        {
+          role: "system",
+          content: `You are an AI interviewer for a Full Stack (React/Node.js) role.
+                    Your task is to generate technical interview questions appropriate to a candidate’s level.
+                    Always return the output strictly as a JSON object with the following key: question.
+                    Never include any explanations or additional text.
+                    Do not repeat previous questions.`,
+        },
+        {
+          role: "user",
+          content: `Generate ONE new ${stage}-level interview question.`,
+        },
+      ],
+      response_format: zodResponseFormat(questionValidator , "question"),
     });
+    console.log(
+      "LLM response:",
+      JSON.parse(response.choices[0].message.content)
+    );
 
-    console.log("LLM response:", response.data.response);
-
-    res.json(parseJson(response.data.response));
+    res.json(JSON.parse(response.choices[0].message.content));
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 app.post("/api/summary", async (req, res) => {
-  const { prompt } = req.body;
+  const { questions } = req.body;
+
+  const formattedQuestions = questions.map((q, index) => `${index + 1}. Q: ${q.question}\n   A: ${q.answer || 'No answer provided'}`)
+        .join('\n\n');
+
   try {
-    console.log("Received prompt:", prompt);
-    const response = await axios.post("http://localhost:11434/api/generate", {
-      model: "llama3.1:latest",
-      prompt,
-      stream: false,
+    const response = await openai.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [
+        {
+          role: "system",
+          content: `You are an interview evaluator for a Full Stack (React/Node.js) role.
+                    Your job is to assess a candidate’s answers and provide objective scoring.
+                    Always return output strictly in JSON format:
+                    with the following keys: summary, score.
+                    Do not include any other text or explanations.`,
+        },
+        {
+          role: "user",
+          content: `Evaluate the following answers. For each answer:
+                    - Score from 0–10.
+                    - Provide one-line feedback.
+
+                    Finally:
+                    - Calculate total score out of 60.
+                    - Write a short 2–3 sentence summary of the candidate’s performance.
+
+                    Questions and Answers:
+                    ${formattedQuestions}`,
+        },
+      ],
+      response_format: zodResponseFormat(evalutionValidator , "evalution"),
     });
+    console.log(
+      "LLM response:",
+      JSON.parse(response.choices[0].message.content)
+    );
 
-    console.log("LLM response:", response.data.response);
-
-    res.json(parseJson(response.data.response));
+    res.json(JSON.parse(response.choices[0].message.content));
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get("/" , (req, res) => {
-    res.send("Hello World");
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
 app.listen(3001, () => console.log("Backend running on http://localhost:3001"));
