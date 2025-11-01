@@ -25,6 +25,11 @@ const questionValidator = z.object({
   question: z.string(),
 });
 
+const resumeValidator = z.object({
+  name: z.string(),
+  email: z.string(),
+  phone: z.string(),
+});
 
 app.post("/api/chat", async (req, res) => {
   const { stage } = req.body;
@@ -100,6 +105,41 @@ app.post("/api/summary", async (req, res) => {
         },
       ],
       response_format: zodResponseFormat(evalutionValidator , "evalution"),
+    });
+    console.log(
+      "LLM response:",
+      JSON.parse(response.choices[0].message.content)
+    );
+
+    res.json(JSON.parse(response.choices[0].message.content));
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/resume", async (req, res) => {
+  const { resume } = req.body;
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [
+        {
+          role: "system",
+          content: `You are a resume parser. Extract the following fields from the resume text:
+
+        - Full Name
+        - Email
+        - Phone number
+
+        Return the result in valid JSON format with keys: name, email, phone`,
+        },
+        {
+          role: "user",
+          content: `Resume: ${resume}`,
+        },
+      ],
+      response_format: zodResponseFormat(resumeValidator, "resume"),
     });
     console.log(
       "LLM response:",

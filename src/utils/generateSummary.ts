@@ -2,6 +2,7 @@
 // import {GoogleGenAI} from '@google/genai'
 import type { Question } from '../types'
 import axios from 'axios';
+import { backendUrl } from './backend';
 
 // const genai = new GoogleGenAI({
 //     apiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
@@ -60,7 +61,7 @@ export const generateSummary = async (questions: Question[]) => {
   try {
 
 
-    const res = await axios.post('http://localhost:3001/api/summary', {
+    const res = await axios.post(`${backendUrl}api/summary`, {
                   questions: questions
                 });
   const data = await res.data;

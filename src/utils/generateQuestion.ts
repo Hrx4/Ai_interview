@@ -1,6 +1,7 @@
 
 // import {GoogleGenAI} from '@google/genai'
 import axios from 'axios';
+import { backendUrl } from './backend';
 
 // const genai = new GoogleGenAI({
 //     apiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
@@ -39,7 +40,7 @@ import axios from 'axios';
 //OLLAMA response
 export const generateQuestion = async (stage: string) => {
   try {
-    const res = await axios.post("http://localhost:3001/api/chat", { stage: stage
+    const res = await axios.post(`${backendUrl}api/chat`, { stage: stage
   });
   const data = await res.data;
   if(res.status !== 200){
