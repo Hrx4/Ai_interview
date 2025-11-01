@@ -61,7 +61,15 @@ app.post("/api/chat", async (req, res) => {
 });
 
 app.post("/api/summary", async (req, res) => {
-  const { questions } = req.body;
+
+  const questionsSchema = z.array(
+    z.object({
+      question: z.string(),
+      answer: z.string().optional(),
+    })
+  )
+  
+  const questions = questionsSchema.parse(req.body)
 
   const formattedQuestions = questions.map((q, index) => `${index + 1}. Q: ${q.question}\n   A: ${q.answer || 'No answer provided'}`)
         .join('\n\n');
